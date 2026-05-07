@@ -64,15 +64,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse getAccount(Long id) {
-        Account account = getAccountById(id);
+    public AccountResponse getAccount(String email, Long id) {
+        Account account = getOwnedAccountById(id, email);
         return mapToAccountResponse(account);
     }
 
     @Override
     @Transactional
-    public AccountResponse deposit(TransactionRequest request) {
-        Account account = getAccountById(request.getAccountId());
+    public AccountResponse deposit(String email, TransactionRequest request) {
+        Account account = getOwnedAccountById(request.getAccountId(), email);
 
         account.setBalance(account.getBalance().add(request.getAmount()));
         accountRepository.save(account);
@@ -84,8 +84,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse withdraw(TransactionRequest request) {
-        Account account = getAccountById(request.getAccountId());
+    public AccountResponse withdraw(String email, TransactionRequest request) {
+        Account account = getOwnedAccountById(request.getAccountId(), email);
 
         if (account.getBalance().compareTo(request.getAmount()) < 0) {
             throw new InsufficientBalanceException("Insufficient balance for withdrawal");
@@ -101,8 +101,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse transfer(TransferRequest request) {
-        Account fromAccount = getAccountById(request.getFromAccountId());
+    public AccountResponse transfer(String email, TransferRequest request) {
+        Account fromAccount = getOwnedAccountById(request.getFromAccountId(), email);
         Account toAccount = getAccountById(request.getToAccountId());
 
         if (fromAccount.getId().equals(toAccount.getId())) {
@@ -126,7 +126,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Page<TransactionResponse> getTransactionHistory(Long accountId, int page, int size) {
+    public Page<TransactionResponse> getTransactionHistory(String email, Long accountId, int page, int size) {
+        getOwnedAccountById(accountId, email);
         Pageable pageable = PageRequest.of(page, size);
         Page<Transaction> transactions = transactionRepository.findByAccountIdOrderByTimestampDesc(accountId, pageable);
         return transactions.map(this::mapToTransactionResponse);
@@ -134,6 +135,11 @@ public class AccountServiceImpl implements AccountService {
 
     private Account getAccountById(Long id) {
         return accountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + id));
+    }
+
+    private Account getOwnedAccountById(Long id, String email) {
+        return accountRepository.findByIdAndUserEmail(id, email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: " + id));
     }
 

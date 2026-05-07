@@ -11,13 +11,13 @@ import java.math.BigDecimal;
 public interface AccountService {
     AccountResponse createAccount(String email, BigDecimal initialBalance);
 
-    AccountResponse getAccount(Long id);
+    AccountResponse getAccount(String email, Long id);
 
-    AccountResponse deposit(TransactionRequest request);
+    AccountResponse deposit(String email, TransactionRequest request);
 
-    AccountResponse withdraw(TransactionRequest request);
+    AccountResponse withdraw(String email, TransactionRequest request);
 
-    AccountResponse transfer(TransferRequest request);
+    AccountResponse transfer(String email, TransferRequest request);
 
-    Page<TransactionResponse> getTransactionHistory(Long accountId, int page, int size);
+    Page<TransactionResponse> getTransactionHistory(String email, Long accountId, int page, int size);
 }

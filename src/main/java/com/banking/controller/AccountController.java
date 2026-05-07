@@ -34,30 +34,34 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponse> getAccount(@PathVariable Long id) {
-        return ResponseEntity.ok(accountService.getAccount(id));
+    public ResponseEntity<AccountResponse> getAccount(Authentication authentication, @PathVariable Long id) {
+        return ResponseEntity.ok(accountService.getAccount(authentication.getName(), id));
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<AccountResponse> deposit(@Valid @RequestBody TransactionRequest request) {
-        return ResponseEntity.ok(accountService.deposit(request));
+    public ResponseEntity<AccountResponse> deposit(Authentication authentication,
+            @Valid @RequestBody TransactionRequest request) {
+        return ResponseEntity.ok(accountService.deposit(authentication.getName(), request));
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<AccountResponse> withdraw(@Valid @RequestBody TransactionRequest request) {
-        return ResponseEntity.ok(accountService.withdraw(request));
+    public ResponseEntity<AccountResponse> withdraw(Authentication authentication,
+            @Valid @RequestBody TransactionRequest request) {
+        return ResponseEntity.ok(accountService.withdraw(authentication.getName(), request));
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<AccountResponse> transfer(@Valid @RequestBody TransferRequest request) {
-        return ResponseEntity.ok(accountService.transfer(request));
+    public ResponseEntity<AccountResponse> transfer(Authentication authentication,
+            @Valid @RequestBody TransferRequest request) {
+        return ResponseEntity.ok(accountService.transfer(authentication.getName(), request));
     }
 
     @GetMapping("/transactions/{accountId}")
     public ResponseEntity<Page<TransactionResponse>> getTransactionHistory(
+            Authentication authentication,
             @PathVariable Long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(accountService.getTransactionHistory(accountId, page, size));
+        return ResponseEntity.ok(accountService.getTransactionHistory(authentication.getName(), accountId, page, size));
     }
 }

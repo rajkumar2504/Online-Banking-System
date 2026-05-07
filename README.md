@@ -2,13 +2,52 @@
 
 A production-level Online Banking System backend built with Java 17, Spring Boot, Spring Security (JWT), and MySQL.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    Client["API Client / Swagger UI"] -->|HTTP JSON| Security["Spring Security Filter Chain"]
+    Security -->|Public endpoints| AuthController["AuthController"]
+    Security -->|Bearer JWT| AccountController["AccountController"]
+
+    AuthController --> AuthService["AuthService"]
+    AccountController --> AccountService["AccountService"]
+
+    AuthService --> UserRepository["UserRepository"]
+    AuthService --> JwtProvider["JwtTokenProvider"]
+
+    AccountService --> AccountRepository["AccountRepository"]
+    AccountService --> TransactionRepository["TransactionRepository"]
+    AccountService --> Ownership["Ownership Check by User Email"]
+    AccountService --> Locking["Optimistic Locking with Account Version"]
+
+    UserRepository --> Database[("MySQL Database")]
+    AccountRepository --> Database
+    TransactionRepository --> Database
+```
+
+## Documentation
+
+- [Project Documentation](docs/PROJECT_DOCUMENTATION.md)
+- [API Documentation](docs/API_DOCUMENTATION.md)
+- [Security Notes](docs/SECURITY.md)
+
 ## Build and Run
 
 1. Make sure MySQL is running and create a database named `online_banking`.
    ```sql
    CREATE DATABASE online_banking;
    ```
-2. Update the database credentials in `src/main/resources/application.properties` if needed.
+2. Set the required environment variables.
+   ```bash
+   DB_USERNAME=your_mysql_username
+   DB_PASSWORD=your_mysql_password
+   JWT_SECRET=base64_encoded_256_bit_or_stronger_secret
+   ```
+   Example JWT secret generation:
+   ```bash
+   openssl rand -base64 32
+   ```
 3. Build the project:
    ```bash
    mvn clean install
@@ -177,6 +216,7 @@ CREATE TABLE accounts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     account_number VARCHAR(255) NOT NULL UNIQUE,
     balance DECIMAL(38,2) NOT NULL,
+    version BIGINT,
     user_id BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
