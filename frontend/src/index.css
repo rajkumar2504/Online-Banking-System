@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import './styles/variables.css';
+@import './styles/global.css';
+@import './styles/components.css';
+
+/* Reset of default Vite stylesheet */
+
+/* Reset of default Vite stylesheet */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+/* Global Variables */
+
+:root {
+  /* Core fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Outfit', var(--font-sans);
+  /* Existing variables are imported from variables.css */
+}
+
+/* Sidebar user info */
+.sidebar-user .user-name {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sidebar-user .user-premium-badge {
+  display: inline-block;
+  background: #2a1f5e;
+  color: #a78bfa;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin-top: 4px;
+}
+
+/* Empty state general */
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 20px;
+}
+
+/* Dashboard empty state */
+.dashboard-empty-state .dashboard-empty-icon svg {
+  width: 80px;
+  height: 80px;
+  stroke-width: 2;
+  color: var(--color-primary);
+}
+
+.dashboard-empty-heading {
+  font-size: 1.5rem;
+  margin-top: 16px;
+  color: var(--text-primary);
+}
+
+.dashboard-empty-subtext {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* Transfer empty state */
+.transfer-empty-state .transfer-empty-icon svg {
+  width: 96px;
+  height: 96px;
+  stroke-width: 2;
+  color: var(--color-primary);
+}
+
+.transfer-empty-heading {
+  font-size: 1.4rem;
+  margin-top: 12px;
+  color: var(--text-primary);
+}
+
+/* Transaction History empty state */
+.txh-empty-state .txh-empty-icon svg {
+  width: 96px;
+  height: 96px;
+  stroke-width: 2;
+  color: var(--color-primary);
+}
+
+.txh-empty-heading {
+  font-size: 1.4rem;
+  margin-top: 12px;
+  color: var(--text-primary);
+}
+
+/* Muted text for zero stats */
+.stat-card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-disabled);
+}

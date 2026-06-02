@@ -1,14 +1,26 @@
-# Online Banking System API
+# Online Banking System (Full-Stack)
 
-A production-level Online Banking System backend built with Java 17, Spring Boot, Spring Security (JWT), and MySQL.
+A modern, production-grade Online Banking System built with a **React JS (Vite)** frontend and a **Spring Boot (Java 17)** REST API backend, backed by **MySQL** for data persistence.
 
-## Architecture
+---
+
+## 📂 Project Structure
+
+The project is structured as a monorepo containing distinct directories for the client application and the API service:
+
+* **`/backend`**: The Spring Boot backend. Exposes JWT-secured REST endpoints, validates banking rules (balances, transfers, authentication), and interfaces with the MySQL database.
+* **`/frontend`**: The React Single Page Application (SPA). Built with Vite and customized Vanilla CSS, featuring a glassmorphic dark-theme dashboard.
+* **`/docs`**: Architectural, security, and API documentation files.
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
-flowchart LR
-    Client["API Client / Swagger UI"] -->|HTTP JSON| Security["Spring Security Filter Chain"]
-    Security -->|Public endpoints| AuthController["AuthController"]
-    Security -->|Bearer JWT| AccountController["AccountController"]
+flowchart TD
+    Client["React SPA (Vite / localhost:5173)"] -->|HTTPS + Bearer JWT| Security["Spring Security Filter Chain (localhost:8080)"]
+    Security -->|Public /auth| AuthController["AuthController"]
+    Security -->|Protected /account| AccountController["AccountController"]
 
     AuthController --> AuthService["AuthService"]
     AccountController --> AccountService["AccountService"]
@@ -18,190 +30,87 @@ flowchart LR
 
     AccountService --> AccountRepository["AccountRepository"]
     AccountService --> TransactionRepository["TransactionRepository"]
-    AccountService --> Ownership["Ownership Check by User Email"]
-    AccountService --> Locking["Optimistic Locking with Account Version"]
+    AccountService --> Ownership["Ownership Validation by User Email"]
+    AccountService --> Locking["Optimistic Locking (Account @Version)"]
 
     UserRepository --> Database[("MySQL Database")]
     AccountRepository --> Database
     TransactionRepository --> Database
 ```
 
-## Documentation
+---
 
-- [Project Documentation](docs/PROJECT_DOCUMENTATION.md)
-- [API Documentation](docs/API_DOCUMENTATION.md)
-- [Security Notes](docs/SECURITY.md)
+## 🚀 Build and Run Instructions
 
-## Build and Run
-
-1. Make sure MySQL is running and create a database named `online_banking`.
-   ```sql
-   CREATE DATABASE online_banking;
-   ```
-2. Set the required environment variables.
-   ```bash
-   DB_USERNAME=your_mysql_username
-   DB_PASSWORD=your_mysql_password
-   JWT_SECRET=base64_encoded_256_bit_or_stronger_secret
-   ```
-   Example JWT secret generation:
-   ```bash
-   openssl rand -base64 32
-   ```
-3. Build the project:
-   ```bash
-   mvn clean install
-   ```
-4. Run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
-The application will start on `http://localhost:8080`.
-
-## Swagger Documentation
-
-Once the app is running, navigate to the Swagger UI to view and test all endpoints:
-`http://localhost:8080/swagger-ui.html`
-
-## Sample JSON Requests & Responses
-
-### 1. User Registration
-`POST /api/auth/register`
-**Request:**
-```json
-{
-  "name": "John Doe",
-  "email": "johndoe@example.com",
-  "password": "password123"
-}
-```
-**Response (201 Created):**
-```text
-User registered successfully!
+### 1. Database Setup
+Ensure you have MySQL running locally and create a database named `online_banking`:
+```sql
+CREATE DATABASE online_banking;
 ```
 
-### 2. User Login
-`POST /api/auth/login`
-**Request:**
-```json
-{
-  "email": "johndoe@example.com",
-  "password": "password123"
-}
-```
-**Response (200 OK):**
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-  "tokenType": "Bearer"
-}
-```
-*Note: Include this access token in the `Authorization` header for all protected endpoints (`Bearer <token>`).*
+### 2. Configure & Run Backend
+Navigate to the `backend` folder and set the required environment variables:
+```bash
+# Navigate to the backend
+cd backend
 
-### 3. Create Account
-`POST /api/account/create`
-**Request:**
-```json
-{
-  "initialBalance": 1000.00
-}
-```
-**Response (201 Created):**
-```json
-{
-  "id": 1,
-  "accountNumber": "AC3F9B1E2D",
-  "balance": 1000.00,
-  "userName": "John Doe"
-}
-```
+# Set environment variables (Windows PowerShell examples)
+$env:DB_USERNAME="your_mysql_username"
+$env:DB_PASSWORD="your_mysql_password"
+$env:JWT_SECRET="base64_encoded_256_bit_or_stronger_secret" # e.g. MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=
 
-### 4. Deposit Money
-`POST /api/account/deposit`
-**Request:**
-```json
-{
-  "accountId": 1,
-  "amount": 500.00
-}
+# Start the application
+mvn spring-boot:run
 ```
-**Response (200 OK):**
-```json
-{
-  "id": 1,
-  "accountNumber": "AC3F9B1E2D",
-  "balance": 1500.00,
-  "userName": "John Doe"
-}
-```
+*The backend API will start on `http://localhost:8080`.*
 
-### 5. Withdraw Money
-`POST /api/account/withdraw`
-**Request:**
-```json
-{
-  "accountId": 1,
-  "amount": 200.00
-}
-```
-**Response (200 OK):**
-```json
-{
-  "id": 1,
-  "accountNumber": "AC3F9B1E2D",
-  "balance": 1300.00,
-  "userName": "John Doe"
-}
-```
+### 3. Configure & Run Frontend
+Navigate to the `frontend` folder, install packages, and start the development server:
+```bash
+# Navigate to the frontend
+cd ../frontend
 
-### 6. Transfer Money
-`POST /api/account/transfer`
-**Request:**
-```json
-{
-  "fromAccountId": 1,
-  "toAccountId": 2,
-  "amount": 300.00
-}
-```
-**Response (200 OK):**
-```json
-{
-  "id": 1,
-  "accountNumber": "AC3F9B1E2D",
-  "balance": 1000.00,
-  "userName": "John Doe"
-}
-```
+# Install dependencies
+npm install
 
-### 7. Get Transaction History
-`GET /api/account/transactions/1?page=0&size=10`
-**Response (200 OK):**
-```json
-{
-  "content": [
-    {
-      "id": 1,
-      "type": "TRANSFER",
-      "amount": 300.00,
-      "timestamp": "2023-10-25T14:30:22.123",
-      "accountNumber": "AC3F9B1E2D",
-      "targetAccountId": 2
-    }
-  ],
-  "pageable": { ... },
-  "last": true,
-  "totalPages": 1,
-  "totalElements": 1,
-  "size": 10,
-  "number": 0,
-  "first": true,
-  "numberOfElements": 1,
-  "empty": false
-}
+# Start Vite server
+npm run dev
 ```
+*The frontend application will start on `http://localhost:5173`.*
 
-## Database Schema (Automatically Generated by Hibernate)
+---
+
+## 📖 API Documentation & Swagger
+
+* **Interactive Swagger UI**: Once the backend is running, you can test and view endpoints at:
+  `http://localhost:8080/swagger-ui.html`
+* **Additional Documentation**:
+  * [Project Documentation](docs/PROJECT_DOCUMENTATION.md)
+  * [API Endpoint Reference](docs/API_DOCUMENTATION.md)
+  * [Security Design Notes](docs/SECURITY.md)
+
+---
+
+## 🛠️ Main REST Endpoints Summary
+
+### Authentication
+* `POST /api/auth/register` - Create a new user account.
+* `POST /api/auth/login` - Login to receive a signed JWT bearer token.
+
+### Account Management (JWT Required)
+* `POST /api/account/create` - Open a checking account with an optional initial balance.
+* `GET /api/account/my-accounts` - Retrieve all accounts owned by the authenticated user.
+* `GET /api/account/{id}` - Retrieve a specific account's details (checks ownership).
+
+### Transactions (JWT Required)
+* `POST /api/account/deposit` - Deposit money into a checking account.
+* `POST /api/account/withdraw` - Withdraw money from a checking account (checks balance constraints).
+* `POST /api/account/transfer` - Transfer money from an owned account to any recipient account.
+* `GET /api/account/transactions/{accountId}` - Retrieve a paginated transaction history ledger.
+
+---
+
+## 📊 Database Schema
 
 ```sql
 CREATE TABLE users (
