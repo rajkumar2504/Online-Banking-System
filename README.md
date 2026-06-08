@@ -10,7 +10,7 @@ The project is structured as a monorepo containing distinct directories for the 
 
 * **`/backend`**: The Spring Boot backend. Exposes JWT-secured REST endpoints, validates banking rules (balances, transfers, authentication), and interfaces with the MySQL database.
 * **`/frontend`**: The React Single Page Application (SPA). Built with Vite and customized Vanilla CSS, featuring a glassmorphic dark-theme dashboard.
-* **`/docs`**: Architectural, security, and API documentation files.
+* **`/docs`**: Architectural, security, and API documentation files.  http://localhost:8080/swagger-ui/index.html
 
 ---
 
